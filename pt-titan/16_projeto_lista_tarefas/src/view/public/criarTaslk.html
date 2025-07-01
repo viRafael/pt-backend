@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Criar Nova Tarefa - TaskFlow</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #2d3748;
+            background: linear-gradient(135deg, #667eea 0%, #f6ad55 50%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding-left: 20px;
+            padding-right: 20px;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(45deg, #667eea, #f6ad55, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .back-btn {
+            color: #4a5568;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .back-btn:hover {
+            background: linear-gradient(45deg, #f6ad55, #667eea);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        main {
+            margin-top: 100px;
+            padding: 2rem 0;
+            min-height: calc(100vh - 180px);
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+        }
+
+        .form-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 3rem;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            width: 100%;
+            max-width: 600px;
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        .form-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .form-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(45deg, #f6ad55, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .form-subtitle {
+            color: #4a5568;
+            font-size: 1.1rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #2d3748;
+            font-size: 1rem;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #f6ad55;
+            box-shadow: 0 0 0 3px rgba(246, 173, 85, 0.1);
+        }
+
+        .form-textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .form-select {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: white;
+            cursor: pointer;
+        }
+
+        .form-select:focus {
+            outline: none;
+            border-color: #f6ad55;
+            box-shadow: 0 0 0 3px rgba(246, 173, 85, 0.1);
+        }
+
+        .priority-options {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .priority-option {
+            flex: 1;
+            min-width: 120px;
+        }
+
+        .priority-radio {
+            display: none;
+        }
+
+        .priority-label {
+            display: block;
+            padding: 1rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            background: white;
+        }
+
+        .priority-radio:checked + .priority-label {
+            border-color: #f6ad55;
+            background: linear-gradient(45deg, #f6ad55, #ed8936);
+            color: white;
+            box-shadow: 0 4px 15px rgba(246, 173, 85, 0.3);
+        }
+
+        .priority-label:hover {
+            border-color: #f6ad55;
+            transform: translateY(-2px);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+            justify-content: center;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #f6ad55, #ed8936);
+            color: white;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 20px rgba(246, 173, 85, 0.3);
+            min-width: 150px;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(246, 173, 85, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.2);
+            color: #4a5568;
+            padding: 1rem 2rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 150px;
+        }
+
+        .btn-secondary:hover {
+            background: #f7fafc;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .success-message {
+            background: linear-gradient(45deg, #48bb78, #38a169);
+            color: white;
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            text-align: center;
+            font-weight: 600;
+            display: none;
+            animation: slideInFromTop 0.5s ease-out;
+        }
+
+        .form-hint {
+            font-size: 0.9rem;
+            color: #718096;
+            margin-top: 0.25rem;
+        }
+
+        .required {
+            color: #e53e3e;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideInFromTop {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .form-container {
+                padding: 2rem;
+                margin: 1rem;
+            }
+
+            .form-title {
+                font-size: 2rem;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .priority-options {
+                flex-direction: column;
+            }
+
+            .form-actions {
+                flex-direction: column;
+            }
+
+            .btn-primary,
+            .btn-secondary {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">TaskFlow</div>
+            <a href="#" class="back-btn">
+                ← Voltar
+            </a>
+        </nav>
+    </header>
+
+    <main>
+        <div class="container">
+            <div class="form-container">
+                <div id="successMessage" class="success-message">
+                    ✅ Tarefa criada com sucesso!
+                </div>
+
+                <div class="form-header">
+                    <h1 class="form-title">Nova Tarefa</h1>
+                    <p class="form-subtitle">Organize suas ideias e transforme-as em ação</p>
+                </div>
+
+                <form id="taskForm">
+                    <div class="form-group">
+                        <label for="taskTitle" class="form-label">
+                            Título da Tarefa <span class="required">*</span>
+                        </label>
+                        <input 
+                            type="text" 
+                            id="taskTitle" 
+                            name="taskTitle" 
+                            class="form-input" 
+                            placeholder="Ex: Finalizar relatório mensal"
+                            required
+                        >
+                        <div class="form-hint">Seja específico e claro sobre o que precisa ser feito</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="taskDescription" class="form-label">Descrição</label>
+                        <textarea 
+                            id="taskDescription" 
+                            name="taskDescription" 
+                            class="form-input form-textarea" 
+                            placeholder="Descreva os detalhes da tarefa, passos necessários ou observações importantes..."
+                        ></textarea>
+                        <div class="form-hint">Adicione contexto e detalhes que te ajudarão a executar a tarefa</div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="taskCategory" class="form-label">Categoria</label>
+                            <select id="taskCategory" name="taskCategory" class="form-select">
+                                <option value="">Selecione uma categoria</option>
+                                <option value="trabalho">🏢 Trabalho</option>
+                                <option value="pessoal">👤 Pessoal</option>
+                                <option value="estudo">📚 Estudo</option>
+                                <option value="saude">💪 Saúde</option>
+                                <option value="casa">🏠 Casa</option>
+                                <option value="financeiro">💰 Financeiro</option>
+                                <option value="outros">📋 Outros</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="taskDueDate" class="form-label">Data de Vencimento</label>
+                            <input 
+                                type="date" 
+                                id="taskDueDate" 
+                                name="taskDueDate" 
+                                class="form-input"
+                            >
+                            <div class="form-hint">Quando esta tarefa deve ser concluída?</div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Prioridade</label>
+                        <div class="priority-options">
+                            <div class="priority-option">
+                                <input type="radio" id="priorityLow" name="priority" value="baixa" class="priority-radio">
+                                <label for="priorityLow" class="priority-label">
+                                    🟢 Baixa
+                                </label>
+                            </div>
+                            <div class="priority-option">
+                                <input type="radio" id="priorityMedium" name="priority" value="media" class="priority-radio" checked>
+                                <label for="priorityMedium" class="priority-label">
+                                    🟡 Média
+                                </label>
+                            </div>
+                            <div class="priority-option">
+                                <input type="radio" id="priorityHigh" name="priority" value="alta" class="priority-radio">
+                                <label for="priorityHigh" class="priority-label">
+                                    🔴 Alta
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="estimatedTime" class="form-label">Tempo Estimado</label>
+                            <select id="estimatedTime" name="estimatedTime" class="form-select">
+                                <option value="">Selecione o tempo</option>
+                                <option value="15min">15 minutos</option>
+                                <option value="30min">30 minutos</option>
+                                <option value="1h">1 hora</option>
+                                <option value="2h">2 horas</option>
+                                <option value="4h">4 horas</option>
+                                <option value="1d">1 dia</option>
+                                <option value="varios">Vários dias</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="taskTags" class="form-label">Tags</label>
+                            <input 
+                                type="text" 
+                                id="taskTags" 
+                                name="taskTags" 
+                                class="form-input" 
+                                placeholder="reunião, urgente, cliente..."
+                            >
+                            <div class="form-hint">Separe as tags por vírgula</div>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn-primary">
+                            Criar Tarefa
+                        </button>
+                        <button type="button" class="btn-secondary" onclick="clearForm()">
+                            Limpar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Função para submeter o formulário
+        document.getElementById('taskForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Simular criação da tarefa
+            const successMessage = document.getElementById('successMessage');
+            successMessage.style.display = 'block';
+            
+            // Scroll para o topo para mostrar a mensagem
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            
+            // Esconder a mensagem após 3 segundos
+            setTimeout(() => {
+                successMessage.style.display = 'none';
+            }, 3000);
+            
+            // Limpar o formulário após mostrar sucesso
+            setTimeout(() => {
+                clearForm();
+            }, 1000);
+        });
+
+        // Função para limpar o formulário
+        function clearForm() {
+            document.getElementById('taskForm').reset();
+            
+            // Resetar prioridade para média
+            document.getElementById('priorityMedium').checked = true;
+            
+            // Focar no primeiro campo
+            document.getElementById('taskTitle').focus();
+        }
+
+        // Definir data mínima como hoje
+        document.getElementById('taskDueDate').min = new Date().toISOString().split('T')[0];
+
+        // Animação nos campos de prioridade
+        document.querySelectorAll('.priority-label').forEach(label => {
+            label.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-2px) scale(1.02)';
+            });
+            
+            label.addEventListener('mouseleave', function() {
+                if (!this.previousElementSibling.checked) {
+                    this.style.transform = 'translateY(0) scale(1)';
+                }
+            });
+        });
+
+        // Contador de caracteres para o título
+        document.getElementById('taskTitle').addEventListener('input', function() {
+            const maxLength = 100;
+            const currentLength = this.value.length;
+            
+            if (currentLength > maxLength) {
+                this.value = this.value.substring(0, maxLength);
+            }
+        });
+
+        // Auto-resize textarea
+        document.getElementById('taskDescription').addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = this.scrollHeight + 'px';
+        });
+
+        // Formatação automática de tags
+        document.getElementById('taskTags').addEventListener('blur', function() {
+            const tags = this.value.split(',').map(tag => tag.trim()).filter(tag => tag);
+            this.value = tags.join(', ');
+        });
+
+        // Animações de entrada
+        window.addEventListener('load', function() {
+            const formContainer = document.querySelector('.form-container');
+            formContainer.style.opacity = '0';
+            formContainer.style.transform = 'translateY(30px)';
+            
+            setTimeout(() => {
+                formContainer.style.transition = 'all 0.8s ease-out';
+                formContainer.style.opacity = '1';
+                formContainer.style.transform = 'translateY(0)';
+            }, 100);
+        });
+
+        // Validação em tempo real
+        document.getElementById('taskTitle').addEventListener('input', function() {
+            if (this.value.trim().length < 3) {
+                this.style.borderColor = '#fed7d7';
+            } else {
+                this.style.borderColor = '#c6f6d5';
+            }
+        });
+    </script>
+</body>
+</html>

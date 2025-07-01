@@ -16,7 +16,7 @@ export class CreateUseMovieCase {
             throw new AppError("Movie already exists!")
         }
 
-        // Cria o User
+        // Cria o Movie
         const movie = await prisma.movie.create({
             data: {
                 title, 

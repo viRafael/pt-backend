@@ -19,4 +19,9 @@
     - um que não existe
     - um que já existe
 
+- Criar um "movie rent"
+    - um novo
+    - um que já esta alugado
+
+
 => Que arquivo de merda é essa que aparece quando faço "migrate", o /generated dentro de /src
