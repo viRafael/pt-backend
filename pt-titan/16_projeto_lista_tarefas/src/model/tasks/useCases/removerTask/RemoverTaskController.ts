@@ -3,11 +3,12 @@ import { RemoverTaskUseCase } from "./RemoverTaskUseCase";
 
 export class RemoverTaskController {
     async handle(req: Request, res: Response) {
-        const { taskId, titulo } = req.body
+        const { id } = req.params
 
         const removerTaskUseCase = new RemoverTaskUseCase()
-        const resultado = removerTaskUseCase.executar({ taskId, titulo })
+        const resultado = removerTaskUseCase.executar({ id })
 
-        return resultado
+        res.status(200).json(resultado)
+        return 
     }
 }

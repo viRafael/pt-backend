@@ -1,4 +1,4 @@
-import { Router } from "express"
+import { Router, Request, Response } from "express"
 import { CreateMovieController } from "../model/movies/useCases/createMovie/CreateMovieController"
 import { CreateMovieRentController } from "../model/movies/useCases/createMoveRent/CreateMovieRentController"
 import { GetMoviesByReleaseDateController } from "../model/movies/useCases/getMoviesByReleaseDate/GetMoviesByReleaseDateController"

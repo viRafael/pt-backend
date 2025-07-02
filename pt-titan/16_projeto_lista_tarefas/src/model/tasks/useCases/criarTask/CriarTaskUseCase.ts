@@ -1,14 +1,15 @@
-import { Task } from "../../../../../prisma/generated/prisma";
+import { Task } from "@prisma/client";
 import { prisma } from "../../../../prisma/cliente";
 import { CriarTaskDTO } from "../../dto/CriarTaskDTO";
 
 export class CriarTaskUseCase {
-    async executar({ titulo, descricao }: CriarTaskDTO): Promise<Task> { // Pode ter um erro aqui, por causa do import "task"
+    async executar({ titulo, descricao, concluida }: CriarTaskDTO): Promise<Task> { // Pode ter um erro aqui, por causa do import "task"
         //Criar a task
-        const task = await prisma.create({
+        const task = await prisma.task.create({
             data: {
-                titulo,
-                descricao
+                titulo: titulo,
+                descricao: descricao,
+                concluida: concluida
             }
         })
 

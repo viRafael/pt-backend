@@ -1,3 +1,5 @@
 export interface AtualizarTaskDTO {
-    taskId: string
+    titulo?: string
+    descricao?: string
+    concluida?: boolean
 }

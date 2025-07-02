@@ -11,16 +11,18 @@ app.use(routes)
 
 app.use((err: Error, request: Request, response: Response, next: NextFunction) => {
     if (err instanceof AppError) {
-        return response.status(err.statusCode).json({
+        response.status(err.statusCode).json({
            status: 'error',
            message: err.message
         })
+        return
     }
 
-    return response.status(500).json({
+    response.status(500).json({
         status: 'error',
         message: `Internal server error - ${err.message}`
     })
+    return 
 })
 
 app.listen(3033, () => {

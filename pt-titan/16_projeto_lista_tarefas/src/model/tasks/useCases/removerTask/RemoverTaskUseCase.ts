@@ -1,12 +1,13 @@
+import { Task } from "@prisma/client";
 import { prisma } from "../../../../prisma/cliente";
 import { RemoverTaskDTO } from "../../dto/RemoverTaskDTO";
 
 export class RemoverTaskUseCase {
-    async executar({ taskId, titulo }: RemoverTaskDTO) {
+    async executar({ id }: RemoverTaskDTO): Promise<Task | null> {
         // Verificar se a task existe
         const taskExiste = await prisma.task.findUnique({
             where: {
-                id: taskId
+                id: id
             }
         })
 
@@ -15,7 +16,7 @@ export class RemoverTaskUseCase {
             //Excluir a task
             removerTask = await prisma.task.delete({
                 where: {
-                    id: taskId
+                    id: id
                 }
             })
         }

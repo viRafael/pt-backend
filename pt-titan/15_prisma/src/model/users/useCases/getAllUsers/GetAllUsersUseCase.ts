@@ -1,3 +1,4 @@
+import { User } from "@prisma/client";
 import { prisma } from "../../../../prisma/cliente";
 
 export class GetAllUsersUseCase {

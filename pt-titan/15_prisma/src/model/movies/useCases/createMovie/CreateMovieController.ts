@@ -9,6 +9,7 @@ export class CreateMovieController {
         const createMovieUseCase = new CreateUseMovieCase()
         const result = await createMovieUseCase.execute({ title, duration, release_date })
 
-        return res.status(201).json(result)
+        res.status(201).json(result)
+        return
     }
 }

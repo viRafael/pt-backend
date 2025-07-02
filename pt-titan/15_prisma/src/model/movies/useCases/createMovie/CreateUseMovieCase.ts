@@ -1,4 +1,4 @@
-import { User } from "@prisma/client";
+import { Movie } from "@prisma/client";
 import { prisma } from "../../../../prisma/cliente";
 import { AppError } from "../../../../errors/AppError";
 import { CreateMovieDTO } from "../../dtos/CreateMovieDTO";

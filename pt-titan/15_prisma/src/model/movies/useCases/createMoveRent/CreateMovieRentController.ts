@@ -9,6 +9,7 @@ export class CreateMovieRentController {
 
     await createMovieRentUseCase.execute({ movieId, userId });
 
-    return res.status(201).send();
+    res.status(201).send();
+    return
   }
 }

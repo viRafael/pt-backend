@@ -7,6 +7,7 @@ export class GetAllUsersController {
 
     const result = await getAllUsersUseCase.execute();
 
-    return res.status(200).json(result);
+    res.status(200).json(result);
+    return
   }
 }
