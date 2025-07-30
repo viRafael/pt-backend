@@ -9,8 +9,8 @@ interface UserSchema {
 }
 
 export class User {
-    propriedade: UserSchema
-    _id : string
+    private propriedade: UserSchema
+    private _id : string
 
     constructor(propriedade: Replace<UserSchema, { createAt?: Date}>, id?: string) {
         this.propriedade = {
