@@ -2,6 +2,7 @@ import { Body, Controller, Post } from "@nestjs/common";
 import { CreateUserUseCase } from "src/modules/user/useCases/createUserUseCase/createUserUserCase";
 import { CreateUserBody } from "./dtos/createUserBody";
 import { UserViewModel } from "./viewModule/userViewModel";
+import { addAbortListener } from "events";
 
 @Controller('users')
 export class UserController {
@@ -22,3 +23,5 @@ export class UserController {
         return UserViewModel.toHttp(user);
     }
 }
+
+
