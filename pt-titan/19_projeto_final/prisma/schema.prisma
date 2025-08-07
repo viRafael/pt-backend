@@ -14,15 +14,15 @@ datasource db {
 }
 
 model User {
-  id         String   @id @default(uuid())
-  name       String
-  email      String   @unique
-  password   String
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
   // Relação 1:N com Meal
-  meals      Meal[]
+  meals Meal[]
 
   @@map("users")
 }
@@ -31,13 +31,13 @@ model Meal {
   id          String   @id @default(uuid())
   name        String
   description String
-  onDiet      Boolean  // Referencia se a refeição está dentro da dieta
-  created_at  DateTime @default(now())
-  updated_at  DateTime @updatedAt
+  onDiet      Boolean // Referencia se a refeição está dentro da dieta
+  createdAt   DateTime @default(now()) @map("created_at")
+  upatedAt    DateTime @updatedAt @map("updated_at")
 
   // Chave estrangeira e relação
-  userId      String
-  user        User     @relation(fields: [userId], references: [id])
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("meals")
 }
