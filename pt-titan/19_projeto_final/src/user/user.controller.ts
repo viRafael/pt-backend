@@ -17,6 +17,6 @@ export class UserController {
   // Rota para retornar as métricas do usuario
   @Get('/getUserMetrics/:idUser')
   getUserMetrics(@Param('idUser') idUser: string) {
-    return this.userService.getUserMetrics();
+    return this.userService.getUserMetrics(idUser);
   }
 }

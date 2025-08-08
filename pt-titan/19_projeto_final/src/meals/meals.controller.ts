@@ -1,5 +1,15 @@
-import { Controller, Get, Param, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+} from '@nestjs/common';
 import { MealsService } from './meals.service';
+import { CreateMealsDTO } from './dto/create.meals.dto';
+import { UpdateMealDTO } from './dto/update.meals.dto';
 
 @Controller('meals')
 export class MealsController {
@@ -7,25 +17,33 @@ export class MealsController {
 
   // Rota para criar uma refeição
   @Post('/createMeal')
-  create() {
-    return this.mealsService.create();
-  }
+  create(@Body() body: CreateMealsDTO) {
+    const { name, description, onDiet, userId } = body;
 
-  // Rota para listar uma refeição especifica do usuario
-  @Get('/getMeal/:idUser')
-  getMeal(@Param('idUser') idUser: string) {
-    return this.mealsService.getMealById(idUser);
+    return this.mealsService.create({ name, description, onDiet, userId });
   }
 
   // Rota para deletar uma refeição
-  @Post('/deleteMeal')
-  delete() {
-    return this.mealsService.delete();
+  @Delete('/deleteMeal/:idMeal')
+  delete(@Param('idUser') idMeal: string) {
+    return this.mealsService.delete(idMeal);
+  }
+
+  // Rota para atualizar um refeição
+  @Patch('/updateMeal/:idMeal')
+  updateMeal(@Param('idMeal') idMeal: string, @Body() bodyData: UpdateMealDTO) {
+    return this.mealsService.updateMeal(idMeal, bodyData);
   }
 
   // Rota para listar todas as refeições do usuario
-  @Get('/getAllMeals')
-  getAllMeals() {
-    return this.mealsService.getAllMeals();
+  @Get('/getAllMeals/:idUser')
+  getAllMeals(@Param('idUser') idUser: string) {
+    return this.mealsService.getAllMeals(idUser);
+  }
+
+  // Rota para listar uma refeição específica do usuário
+  @Get('/getMeal/:userId/:mealId')
+  getMeal(@Param('userId') userId: string, @Param('mealId') mealId: string) {
+    return this.mealsService.getMealById(userId, mealId);
   }
 }
