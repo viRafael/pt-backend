@@ -25,7 +25,7 @@ export class MealsController {
 
   // Rota para deletar uma refeição
   @Delete('/deleteMeal/:idMeal')
-  delete(@Param('idUser') idMeal: string) {
+  delete(@Param('idMeal') idMeal: string) {
     return this.mealsService.delete(idMeal);
   }
 
