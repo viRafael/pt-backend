@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   Param,
+  ParseUUIDPipe,
   Patch,
   Post,
 } from '@nestjs/common';
@@ -25,13 +26,16 @@ export class MealsController {
 
   // Rota para deletar uma refeição
   @Delete('/deleteMeal/:idMeal')
-  delete(@Param('idMeal') idMeal: string) {
+  delete(@Param('idMeal', ParseUUIDPipe) idMeal: string) {
     return this.mealsService.delete(idMeal);
   }
 
   // Rota para atualizar um refeição
   @Patch('/updateMeal/:idMeal')
-  updateMeal(@Param('idMeal') idMeal: string, @Body() bodyData: UpdateMealDTO) {
+  updateMeal(
+    @Param('idMeal', ParseUUIDPipe) idMeal: string,
+    @Body() bodyData: UpdateMealDTO,
+  ) {
     return this.mealsService.updateMeal(idMeal, bodyData);
   }
 

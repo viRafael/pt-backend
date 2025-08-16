@@ -12,67 +12,49 @@ import { isUUID } from 'class-validator';
 @Injectable()
 export class MealsService {
   // Rota para criar uma refeição
-  async create({ name, description, onDiet, userId }: CreateMealsDTO) {
-    if (!isUUID(userId)) {
-      throw new BadRequestException('ID de usuário inválido');
-    }
-
-    try {
-      const meal = await prisma.meal.create({
-        data: {
-          name,
-          description,
-          onDiet,
-          userId,
-        },
-      });
-
-      return meal;
-    } catch (error) {
-      throw new NotFoundException(error, 'Erro ao criar refeição');
-    }
+  create({ name, description, onDiet, userId }: CreateMealsDTO) {
+    return prisma.meal.create({
+      data: {
+        name,
+        description,
+        onDiet,
+        userId,
+      },
+    });
   }
 
   // Rota para deletar uma refeição
   async delete(idMeal: string) {
-    if (!isUUID(idMeal)) {
-      throw new BadRequestException('ID de refeição inválido');
-    }
-
-    try {
-      const meal = await prisma.meal.delete({
-        where: {
-          id: idMeal,
-        },
-      });
-
-      return meal;
-    } catch (error) {
-      throw new NotFoundException(error, 'Refeição não encontrada');
-    }
+    return prisma.meal.delete({
+      where: {
+        id: idMeal,
+      },
+    });
   }
 
   // Implementação da logica da rota de atualização de refeição
   async updateMeal(idMeal: string, bodyData: UpdateMealDTO) {
-    if (!isUUID(idMeal)) {
-      throw new BadRequestException('ID de refeição inválido');
+    // Verificar se existe a meal
+    const meal = await prisma.meal.findUnique({
+      where: {
+        id: idMeal,
+      },
+    });
+
+    if (!meal) {
+      throw new NotFoundException('Refeição não encontrada');
     }
 
-    try {
-      const meal = await prisma.meal.update({
-        where: {
-          id: idMeal,
-        },
-        data: {
-          ...bodyData,
-          updated_at: new Date(),
-        },
-      });
-
-      return meal;
-    } catch (error) {
-      throw new NotFoundException(error, 'Erro ao atualizar refeição');
-    }
+    // Atualiza a meal
+    return await prisma.meal.update({
+      where: {
+        id: idMeal,
+      },
+      data: {
+        ...bodyData,
+        updated_at: new Date(),
+      },
+    });
   }
 
   // Implementação da logica da rota para listar todas as refeições do usuario
@@ -81,17 +63,11 @@ export class MealsService {
       throw new BadRequestException('ID de usuário inválido');
     }
 
-    try {
-      const meals = await prisma.meal.findMany({
-        where: {
-          userId: idUser,
-        },
-      });
-
-      return meals;
-    } catch (error) {
-      throw new NotFoundException(error, 'Erro ao listar todas as refeições');
-    }
+    return prisma.meal.findMany({
+      where: {
+        userId: idUser,
+      },
+    });
   }
 
   // Implementação da rota para listar uma refeição especifica do usuario
