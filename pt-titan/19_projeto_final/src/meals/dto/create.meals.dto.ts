@@ -1,4 +1,4 @@
-import { IsBoolean, IsNotEmpty, IsString, IsUUID } from 'class-validator';
+import { IsBoolean, IsNotEmpty, IsString } from 'class-validator';
 
 export class CreateMealsDTO {
   @IsNotEmpty()
@@ -12,9 +12,4 @@ export class CreateMealsDTO {
   @IsNotEmpty()
   @IsBoolean()
   onDiet: boolean;
-
-  @IsString()
-  @IsNotEmpty()
-  @IsUUID()
-  userId: string;
 }

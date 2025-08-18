@@ -1,4 +1,11 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  ParseUUIDPipe,
+  Post,
+} from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create.user.dto';
 
@@ -7,16 +14,14 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   // Rota de Criação de Usuario
-  @Post('/createUser')
-  createUser(@Body() body: CreateUserDto) {
-    const { name, email, password } = body;
-
-    return this.userService.create({ name, email, password });
+  @Post('/create-user')
+  createUser(@Body() createUserDto: CreateUserDto) {
+    return this.userService.create(createUserDto);
   }
 
   // Rota para retornar as métricas do usuario
-  @Get('/getUserMetrics/:idUser')
-  getUserMetrics(@Param('idUser') idUser: string) {
+  @Get('/get-user-metrics/:id-user')
+  getUserMetrics(@Param('id-user', ParseUUIDPipe) idUser: string) {
     return this.userService.getUserMetrics(idUser);
   }
 }

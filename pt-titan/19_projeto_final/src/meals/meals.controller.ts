@@ -1,5 +1,6 @@
 import {
   Body,
+  ConflictException,
   Controller,
   Delete,
   Get,
@@ -7,47 +8,80 @@ import {
   ParseUUIDPipe,
   Patch,
   Post,
+  Req,
+  UseGuards,
 } from '@nestjs/common';
 import { MealsService } from './meals.service';
 import { CreateMealsDTO } from './dto/create.meals.dto';
 import { UpdateMealDTO } from './dto/update.meals.dto';
+import { JwtAuthGuard } from 'src/auth/guard/jwt-auth.guards';
+import type { Request } from 'express';
 
 @Controller('meals')
+@UseGuards(JwtAuthGuard)
 export class MealsController {
   constructor(private readonly mealsService: MealsService) {}
 
   // Rota para criar uma refeição
-  @Post('/createMeal')
-  create(@Body() body: CreateMealsDTO) {
-    const { name, description, onDiet, userId } = body;
+  @Post('/create-meal')
+  create(@Req() req: Request, @Body() createMealDTO: CreateMealsDTO) {
+    const user = req.user;
 
-    return this.mealsService.create({ name, description, onDiet, userId });
+    if (!user) {
+      throw new ConflictException('User não encontrado na requisição');
+    }
+
+    return this.mealsService.create(user.sub, createMealDTO);
   }
 
   // Rota para deletar uma refeição
-  @Delete('/deleteMeal/:idMeal')
-  delete(@Param('idMeal', ParseUUIDPipe) idMeal: string) {
-    return this.mealsService.delete(idMeal);
+  @Delete('/delete-meal/:id-meal')
+  delete(@Req() req: Request, @Param('id-meal', ParseUUIDPipe) idMeal: string) {
+    const user = req.user;
+
+    if (!user) {
+      throw new ConflictException('User não encontrado na requisição');
+    }
+
+    return this.mealsService.delete(user.sub, idMeal);
   }
 
   // Rota para atualizar um refeição
-  @Patch('/updateMeal/:idMeal')
+  @Patch('/update-meal/:id-meal')
   updateMeal(
-    @Param('idMeal', ParseUUIDPipe) idMeal: string,
-    @Body() bodyData: UpdateMealDTO,
+    @Req() req: Request,
+    @Param('id-meal', ParseUUIDPipe) idMeal: string,
+    @Body() UpdateMealDTO: UpdateMealDTO,
   ) {
-    return this.mealsService.updateMeal(idMeal, bodyData);
+    const user = req.user;
+
+    return this.mealsService.updateMeal(user.sub, idMeal, UpdateMealDTO);
   }
 
   // Rota para listar todas as refeições do usuario
-  @Get('/getAllMeals/:idUser')
-  getAllMeals(@Param('idUser') idUser: string) {
-    return this.mealsService.getAllMeals(idUser);
+  @Get('/get-all-meals')
+  getAllMeals(@Req() req: Request) {
+    const user = req.user;
+
+    if (!user) {
+      throw new ConflictException('User não encontrado na requisição');
+    }
+
+    return this.mealsService.getAllMeals(user.sub);
   }
 
   // Rota para listar uma refeição específica do usuário
-  @Get('/getMeal/:userId/:mealId')
-  getMeal(@Param('userId') userId: string, @Param('mealId') mealId: string) {
-    return this.mealsService.getMealById(userId, mealId);
+  @Get('/get-meal/:meal-id')
+  getMeal(
+    @Req() req: Request,
+    @Param('meal-id', ParseUUIDPipe) mealId: string,
+  ) {
+    const user = req.user;
+
+    if (!user) {
+      throw new ConflictException('User não encontrado na requisição');
+    }
+
+    return this.mealsService.getMealById(user.sub, mealId);
   }
 }

@@ -1,29 +1,32 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create.user.dto';
-import { prisma } from 'src/prisma/cliente';
 import { User } from '@prisma/client';
-import { isUUID } from 'class-validator';
+import { PrismaService } from 'src/common/prisma/prisma.service';
 
 @Injectable()
 export class UserService {
+  constructor(private readonly prismaService: PrismaService) {}
+
   // Implementação da logica da rota de criação de usuario
-  async create({ name, email, password }: CreateUserDto): Promise<User> {
+  async create(createUserDto: CreateUserDto): Promise<User> {
     // Verifica se o email é unico
-    const userAlreadyExist = await prisma.user.findUnique({
-      where: { email },
+    const userAlreadyExist = await this.prismaService.user.findUnique({
+      where: {
+        email: createUserDto.email,
+      },
     });
 
     // Caso já haja um usuario com este email
     if (userAlreadyExist) {
-      throw new BadRequestException('E-mail já está em uso');
+      throw new ConflictException('Credenciais inválidas');
     }
 
     // Cria o usuario
-    return await prisma.user.create({
+    return this.prismaService.user.create({
       data: {
-        name: name,
-        email: email,
-        password: password,
+        name: createUserDto.name,
+        email: createUserDto.email,
+        password: createUserDto.password,
       },
     });
   }
@@ -35,35 +38,27 @@ export class UserService {
     amountOfMealsOutDiet: number;
     bestSequence: number;
   }> {
-    // Verifica se o idUser é de fato um ID
-    if (!isUUID(idUser)) {
-      throw new BadRequestException('ID de usuário inválido');
-    }
-
-    //Quantidade total de refeições registradas
-    const amountOfMeals = await prisma.meal.count({
-      where: { userId: idUser },
-    });
-
-    //Quantidade total de refeições dentro da dieta
-    const amountOfMealsOnDiet = await prisma.meal.count({
-      where: { userId: idUser, onDiet: true },
-    });
-
-    //Quantidade total de refeições fora da dieta
-    const amountOfMealsOutDiet = await prisma.meal.count({
-      where: { userId: idUser, onDiet: false },
-    });
-
-    // Melhor sequência de refeições dentro da dieta (maior sequência contínua)
-    const meals = await prisma.meal.findMany({
-      where: { userId: idUser },
-      orderBy: { created_at: 'asc' },
-      select: { onDiet: true },
-    });
+    const [amountOfMeals, amountOfMealsOnDiet, amountOfMealsOutDiet, meals] =
+      await Promise.all([
+        this.prismaService.meal.count({
+          where: { userId: idUser },
+        }),
+        this.prismaService.meal.count({
+          where: { userId: idUser, onDiet: true },
+        }),
+        this.prismaService.meal.count({
+          where: { userId: idUser, onDiet: false },
+        }),
+        this.prismaService.meal.findMany({
+          where: { userId: idUser },
+          orderBy: { created_at: 'asc' },
+          select: { onDiet: true },
+        }),
+      ]);
 
     let bestSequence = 0;
     let currentSequence = 0;
+
     for (const meal of meals) {
       if (meal.onDiet) {
         currentSequence++;

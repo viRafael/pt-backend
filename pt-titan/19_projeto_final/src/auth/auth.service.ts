@@ -1,56 +1,55 @@
 import {
-  BadRequestException,
   Injectable,
+  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt/dist/jwt.service';
-import { prisma } from 'src/prisma/cliente';
+import { SignInDTO } from './dto/signIn.auth.dto';
+import { User } from '@prisma/client';
+import { UserService } from 'src/user/user.service';
+import { CreateUserDto } from 'src/user/dto/create.user.dto';
+import { PrismaService } from 'src/common/prisma/prisma.service';
 
 @Injectable()
 export class AuthService {
-  constructor(private readonly jwtService: JwtService) {}
+  constructor(
+    private readonly jwtService: JwtService,
+    private readonly userService: UserService,
+    private readonly prismaService: PrismaService,
+  ) {}
 
   // Cadastro
-  async signUp(name: string, email: string, password: string) {
-    // Verifica se o usuário já existe
-    const existUser = await prisma.user.findUnique({
-      where: { email },
-    });
+  async signUp(createUserDTO: CreateUserDto): Promise<User> {
+    return this.userService.create(createUserDTO);
+  }
 
-    if (existUser) {
-      throw new BadRequestException('Email em uso');
-    }
-
-    // Cria o usuário no banco de dados
-    const user = await prisma.user.create({
-      data: {
-        name,
-        email,
-        password: password,
+  async signIn(signInDTO: SignInDTO): Promise<{ accessToken: string }> {
+    // Verificar se existe esse usuario no bando de dados
+    const user = await this.prismaService.user.findUnique({
+      where: {
+        email: signInDTO.email,
       },
     });
 
-    return user;
-  }
-
-  async signIn(email: string, password: string) {
-    // Verificar se existe esse usuario no bando de dados
-    const user = await prisma.user.findUnique({ where: { email } });
     if (!user) {
-      throw new UnauthorizedException('Credenciais inválidas');
+      throw new NotFoundException('Credenciais inválidas');
     }
 
     // Verificamos se a senha que ele passou está correta, não temos scrypt da senha
-    const correctPassword = user.password === password;
+    const correctPassword = user.password === signInDTO.password;
+
     if (!correctPassword) {
       throw new UnauthorizedException('Credenciais inválidas');
     }
 
-    const payload = {
-      username: user.email,
-      sub: user.id,
+    // Fazemos o login
+    return {
+      accessToken: await this.jwtService.signAsync({
+        // Payload | Data
+        sub: user.id,
+        email: user.email,
+        name: user.name,
+      }),
     };
-
-    return { accessToken: this.jwtService.sign(payload) };
   }
 }

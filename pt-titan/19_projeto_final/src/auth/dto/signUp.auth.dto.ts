@@ -1,7 +1,7 @@
 import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
 
 // Cadastro
-export class SignUpAuthDTO {
+export class SignUpDTO {
   @IsNotEmpty()
   @IsString()
   name: string;
